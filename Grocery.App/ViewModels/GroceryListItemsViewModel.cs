@@ -86,5 +86,24 @@ namespace Grocery.App.ViewModels
             }
         }
 
+        // zoekfunctie 
+        [RelayCommand]
+        private void Search(string? term)
+        {
+            /// Standaard de term omzetten naar lowercase en trimmen
+            var t = (term ?? string.Empty).Trim().ToLowerInvariant();
+
+            // 1) Filteren op producten die nog niet in de boodschappenlijst zitten en die op voorraad zijn
+            var filtered = _productService.GetAll()
+                .Where(p => MyGroceryListItems.All(g => g.ProductId != p.Id) && p.Stock > 0);
+            // 2) Filteren op zoekterm
+            if (!string.IsNullOrEmpty(t))
+                filtered = filtered.Where(p => (p.Name ?? string.Empty).ToLowerInvariant().Contains(t));
+            // 3) Resultaat tonen
+            AvailableProducts.Clear();
+            foreach (var p in filtered) AvailableProducts.Add(p);
+        }
+
+
     }
 }
