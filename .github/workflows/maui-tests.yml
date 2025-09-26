@@ -1,0 +1,39 @@
+name: MAUI Build & Unit Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+
+jobs:
+  build_test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install MAUI workloads
+        run: dotnet workload install maui maui-android
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (MAUI app)
+        run: dotnet build ./<pad-naar-jouw-maui-csproj> -c Release --no-restore
+
+      - name: Test (unit tests)
+        run: dotnet test ./<pad-naar-jouw-test-csproj> -c Release --no-build \
+             --logger "trx;LogFileName=tests.trx" \
+             --results-directory ./TestResults
+
+      - name: Upload test artefacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: TestResults/*.trx
