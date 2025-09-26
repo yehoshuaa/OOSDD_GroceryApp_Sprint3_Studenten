@@ -1,4 +1,4 @@
-name: .NET Unit Tests
+name: .NET Unit Tests (UC8/UC9)
 
 on:
   push:
@@ -19,13 +19,13 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore
-        run: dotnet restore
+      - name: Restore (TestCore only)
+        run: dotnet restore ./TestCore/TestCore.csproj
 
-      - name: Build (Core + Tests)
-        run: dotnet build --configuration Release --no-restore
+      - name: Build (TestCore only)
+        run: dotnet build ./TestCore/TestCore.csproj -c Release --no-restore
 
-      - name: Test (NUnit – TestCore)
+      - name: Test (NUnit)
         run: dotnet test ./TestCore/TestCore.csproj -c Release --no-build \
              --logger "trx;LogFileName=tests.trx" \
              --results-directory ./TestResults
